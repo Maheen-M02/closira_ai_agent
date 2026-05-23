@@ -1,6 +1,6 @@
 # Closira AI Agent — Bloom Aesthetics Clinic
 
-A production-quality, four-stage AI customer support workflow built with the Anthropic Claude API. Handles inbound customer enquiries using SOP-grounded responses, lead qualification, escalation detection, and session summarisation.
+A production-quality, four-stage AI customer support workflow built using OpenRouter for multi-model AI access. Handles inbound customer enquiries using SOP-grounded responses, lead qualification, escalation detection, and session summarisation.
 
 ---
 
@@ -17,7 +17,7 @@ A production-quality, four-stage AI customer support workflow built with the Ant
 
 ## Project Structure
 
-```
+```bash
 closira_agent/
 ├── agent.py             # Main agent: all four stages, CLI runner
 ├── sop.py               # SOP data (structured + plain-text for prompt injection)
@@ -37,11 +37,30 @@ closira_agent/
 
 ---
 
+## AI Provider
+
+This project uses OpenRouter as the AI gateway, allowing flexible access to multiple models including Claude, GPT, Gemini, DeepSeek, and more through a unified API.
+
+Recommended model:
+
+```python
+MODEL = "anthropic/claude-4.6-sonnet"
+```
+
+---
+
 ## Setup
 
 ### 1. Prerequisites
+
 - Python 3.10+
-- An Anthropic API key ([get one here](https://console.anthropic.com/))
+- An OpenRouter API key
+
+Get your API key here:
+
+https://openrouter.ai/
+
+---
 
 ### 2. Install dependencies
 
@@ -50,15 +69,20 @@ cd closira_agent
 pip install -r requirements.txt
 ```
 
+---
+
 ### 3. Set your API key
 
-```bash
-export ANTHROPIC_API_KEY="sk-ant-..."
+### Windows PowerShell
+
+```powershell
+$env:OPENROUTER_API_KEY="sk-or-v1-..."
 ```
 
-On Windows:
-```cmd
-set ANTHROPIC_API_KEY=sk-ant-...
+### Mac/Linux
+
+```bash
+export OPENROUTER_API_KEY="sk-or-v1-..."
 ```
 
 ---
@@ -71,7 +95,7 @@ set ANTHROPIC_API_KEY=sk-ant-...
 python agent.py
 ```
 
-**Special commands during a session:**
+### Special commands during a session
 
 | Command | Effect |
 |---|---|
@@ -79,44 +103,97 @@ python agent.py
 | `summary` | Print structured session summary (Stage 4) |
 | `quit` / `exit` | End session (summary auto-generates) |
 
-### Automated Test Runner (all 5 scenarios)
+---
+
+## Automated Test Runner
+
+Run all 5 required test scenarios:
 
 ```bash
 python run_tests.py
 ```
 
-This runs all 5 required test scenarios against the live API and saves transcripts to `test_transcripts/`.
+This runs all scenarios against the live API and saves transcripts to `test_transcripts/`.
 
 ---
 
 ## How It Works
 
 ### Hallucination Prevention
-The SOP is embedded verbatim in the system prompt. The model is explicitly told:
+
+The SOP is embedded directly into the system prompt.
+
+The model is explicitly instructed to:
+
 - Answer ONLY from the SOP
 - Never guess or invent facts
-- Escalate (not guess) when a question is out of scope
+- Escalate instead of hallucinating
+- Avoid unsupported claims
 
-### Escalation Detection (Dual-Layer)
+---
 
-**Layer 1 — Rule-based pre-screening** (no API call, instant):  
-Scans user input for anger, medical, pricing negotiation, and human-request keywords before calling the model.
+## Escalation Detection (Dual-Layer)
 
-**Layer 2 — Model self-flagging**:  
-The model is instructed to output `{ESCALATE: "reason"}` in a structured format when it detects low confidence or an escalation condition. This is parsed and stripped from the customer-facing reply.
+### Layer 1 — Rule-Based Pre-Screening
 
-All escalations are logged to `logs/escalations_<timestamp>.jsonl` with timestamp, session ID, and reason.
+Before calling the model, user input is scanned for:
 
-### Session Logging
-Every turn is logged to `logs/session_<timestamp>.jsonl`. Session summaries are saved as `logs/summary_<timestamp>.json`.
+- Anger/frustration
+- Medical questions
+- Pricing negotiation attempts
+- Human escalation requests
+
+This happens instantly without an API call.
+
+---
+
+### Layer 2 — Model Self-Flagging
+
+The model is instructed to emit structured escalation markers:
+
+```txt
+{ESCALATE: "reason"}
+```
+
+These are automatically parsed and removed from the customer-facing response.
+
+All escalations are logged with:
+
+- Timestamp
+- Session ID
+- Escalation reason
+
+---
+
+## Session Logging
+
+Every conversation turn is logged to:
+
+```bash
+logs/session_<timestamp>.jsonl
+```
+
+Escalations:
+
+```bash
+logs/escalations_<timestamp>.jsonl
+```
+
+Summaries:
+
+```bash
+logs/summary_<timestamp>.json
+```
 
 ---
 
 ## SOP Data
 
-The agent operates on the following SOP (see `sop.py` for full structured version):
+The agent operates using a structured SOP defined in `sop.py`.
 
-```
+Example:
+
+```txt
 Business: Bloom Aesthetics Clinic
 Hours: Monday–Saturday, 9 AM – 7 PM
 
@@ -132,26 +209,94 @@ Escalate if: complaint, medical question, pricing negotiation, >2 unanswered que
 
 ---
 
+## Recommended Models
+
+| Use Case | Recommended Model |
+|---|---|
+| Production support agent | anthropic/claude-3.7-sonnet |
+| Budget-friendly testing | google/gemini-2.5-flash |
+| Fast summaries | openai/gpt-4.1-mini |
+| Cheapest experimentation | deepseek/deepseek-chat-v3 |
+
+---
+
 ## Trade-offs and Known Limitations
 
-- **State is in-memory**: Session state is not persisted across process restarts. Production use would require a database (e.g. Redis, PostgreSQL).
-- **Small SOP only**: The SOP is injected directly into the system prompt. For large knowledge bases (>10k tokens), a RAG (retrieval-augmented generation) approach should be used.
-- **Rule-based escalation keywords**: The pre-screening keyword list may miss novel phrasings of anger or medical questions. A dedicated sentiment/intent classifier could be added as a third layer.
-- **CLI only**: No web UI or webhook integration. For production, connect to the WhatsApp Business API or email provider.
-- **Single-model summarisation**: For very long sessions, the full conversation history is sent for summarisation. For 50+ turn conversations, chunked summarisation would be needed.
+### In-Memory State
+
+Session state is not persisted across restarts.
+
+Production systems should use:
+
+- Redis
+- PostgreSQL
+- MongoDB
+
+---
+
+### Small SOP Only
+
+The SOP is injected directly into the prompt.
+
+For large knowledge bases (>10k tokens), a RAG architecture should be used.
+
+---
+
+### Rule-Based Escalation
+
+Keyword-based escalation detection may miss unusual phrasing.
+
+Production systems could add:
+
+- Sentiment analysis
+- Intent classifiers
+- Safety moderation layers
+
+---
+
+### CLI Only
+
+No frontend or webhook integration is included.
+
+Production deployment could integrate:
+
+- WhatsApp Business API
+- Telegram
+- Web chat
+- Email
+- CRM systems
+
+---
+
+### Long Conversation Summaries
+
+Very long conversations may eventually exceed context limits.
+
+Future improvements could include:
+
+- Chunked summarisation
+- Memory compression
+- Vector databases
 
 ---
 
 ## Dependencies
 
-- `anthropic` — Official Anthropic Python SDK
+```txt
+openai>=1.30.0
+```
+
+The OpenAI-compatible SDK is used with OpenRouter.
 
 ---
 
 ## Evaluation Notes for Reviewers
 
-- All four stages are clearly separated in `agent.py` with comments marking each stage.
-- The system prompt is built by `build_system_prompt()` and fully documented in `prompt_design.md`.
-- Escalation detection is dual-layer: `detect_escalation_in_input()` (pre-screen) and `detect_escalation_in_response()` (post-model).
-- All test transcripts are generated automatically by `run_tests.py`.
-- Logs provide full audit trail for every session.
+- All four stages are clearly separated in `agent.py`
+- Prompt construction is centralized in `build_system_prompt()`
+- Escalation detection is dual-layer:
+  - `detect_escalation_in_input()`
+  - `detect_escalation_in_response()`
+- Structured logs provide a complete audit trail
+- Automated tests generate transcripts for all required scenarios
+- OpenRouter enables flexible multi-model support without changing architecture
