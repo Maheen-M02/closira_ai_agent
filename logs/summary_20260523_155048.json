@@ -1,0 +1,16 @@
+{
+  "customer_intent": "The customer wanted to book an appointment at Bloom Aesthetics Clinic for personal use.",
+  "key_details_collected": [
+    "Customer type: personal",
+    "Estimated treatments per month: 3",
+    "No prior booking or CRM tool experience (first time)",
+    "No deposit required communicated to customer",
+    "Booking options shared: WhatsApp and website"
+  ],
+  "sop_gaps_identified": [],
+  "lead_qualification_summary": "This is a straightforward personal lead with moderate treatment frequency, estimating approximately 3 bookings per month. The customer has no prior experience with booking or CRM tools, suggesting they may benefit from guided onboarding support. Qualification was completed in full with all three profiling questions answered. The lead appears genuine and ready to engage, making them a warm prospect for conversion.",
+  "escalated": false,
+  "escalation_reason": null,
+  "recommended_next_action": "A team member should follow up with the customer promptly to confirm their preferred treatments, suggest suitable appointment slots, and provide a direct booking link via WhatsApp or the website. Given their lack of CRM experience, a brief walkthrough of the booking process may improve conversion.",
+  "session_timestamp": "2026-05-23T15:52:01.542200"
+}
