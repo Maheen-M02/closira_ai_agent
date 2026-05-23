@@ -60,7 +60,7 @@ SOP_DATA = {
     },
 }
 
-# Plain-text version embedded in the system prompt
+
 SOP_TEXT = """
 Business: Bloom Aesthetics Clinic
 Operating Hours: Monday to Saturday, 9:00 AM – 7:00 PM (Closed Sundays & UK Public Holidays)

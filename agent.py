@@ -19,9 +19,7 @@ from openai import OpenAI
 from sop import SOP_DATA, SOP_TEXT
 from logger import ConversationLogger
 
-# ──────────────────────────────────────────────
-# Constants
-# ──────────────────────────────────────────────
+
 
 MODEL = "anthropic/claude-4.6-sonnet"
 MAX_TOKENS = 1024
@@ -32,9 +30,7 @@ QUALIFICATION_QUESTIONS = [
     "Are you currently using any booking or CRM tools, or would this be your first time?",
 ]
 
-# ──────────────────────────────────────────────
-# System Prompt
-# ──────────────────────────────────────────────
+
 
 def build_system_prompt() -> str:
     return f"""You are Aria, a warm and professional AI customer support assistant for Bloom Aesthetics Clinic.
@@ -88,9 +84,7 @@ STRICT RULES — YOU MUST FOLLOW THESE
 You are now ready to assist customers."""
 
 
-# ──────────────────────────────────────────────
-# Escalation Detector
-# ──────────────────────────────────────────────
+
 
 def detect_escalation_in_response(response_text: str) -> tuple[bool, str, str]:
     """
@@ -150,9 +144,7 @@ def detect_escalation_in_input(user_input: str) -> tuple[bool, str]:
     return False, ""
 
 
-# ──────────────────────────────────────────────
-# Lead Qualification
-# ──────────────────────────────────────────────
+
 
 class LeadQualifier:
     def __init__(self):
@@ -179,9 +171,7 @@ class LeadQualifier:
         }
 
 
-# ──────────────────────────────────────────────
-# Conversation Summary Generator
-# ──────────────────────────────────────────────
+
 
 def generate_summary(client, conversation_history: list, lead_data: dict, escalated: bool, escalation_reason: str) -> dict:
     history_text = "\n".join(
@@ -221,7 +211,7 @@ Return ONLY valid JSON (no markdown, no preamble) with these exact keys:
 )
 
     raw = response.choices[0].message.content.strip()
-    # Strip markdown fences if present
+    
     raw = re.sub(r"^```json\s*|^```\s*|```$", "", raw, flags=re.MULTILINE).strip()
     try:
         return json.loads(raw)
@@ -229,9 +219,9 @@ Return ONLY valid JSON (no markdown, no preamble) with these exact keys:
         return {"raw_summary": raw, "parse_error": True}
 
 
-# ──────────────────────────────────────────────
+
 # Main Agent
-# ──────────────────────────────────────────────
+
 
 class ClosiraAgent:
     def __init__(self):
@@ -253,7 +243,7 @@ class ClosiraAgent:
         self.qualifying_mode = False
         self.current_qualification_question: Optional[str] = None
 
-    # ── Internal helpers ──
+    
 
     def _add_user(self, text: str):
         self.conversation_history.append({"role": "user", "content": text})
@@ -284,7 +274,7 @@ class ClosiraAgent:
             f"Please bear with us — someone will be in touch very shortly. 💙"
         )
 
-    # ── Stage routing ──
+  
 
     def respond(self, user_input: str) -> str:
         """Main entry point. Routes input through the four-stage pipeline."""
@@ -327,11 +317,11 @@ class ClosiraAgent:
         self._add_user(user_input)
         raw_reply = self._call_model()
 
-        # Check if model flagged an escalation
+        
         should_escalate_model, model_reason, clean_reply = detect_escalation_in_response(raw_reply)
 
         if should_escalate_model and not self.escalated:
-            self._add_assistant(clean_reply)  # log clean reply first
+            self._add_assistant(clean_reply)  
             escalation_reply = self._handle_escalation(model_reason)
             final_reply = (clean_reply + "\n\n" + escalation_reply).strip() if clean_reply else escalation_reply
             self.logger.log_turn("assistant", final_reply)
@@ -368,9 +358,7 @@ class ClosiraAgent:
         return summary
 
 
-# ──────────────────────────────────────────────
-# CLI Runner
-# ──────────────────────────────────────────────
+
 
 def print_banner():
     print("\n" + "═" * 60)
@@ -422,7 +410,7 @@ def main():
         reply = agent.respond(user_input)
         print(f"\nAria: {reply}\n")
 
-    # Auto-generate summary at end
+    
     print("\n" + "─" * 60)
     print("Session ended. Generating summary...")
     print("─" * 60 + "\n")

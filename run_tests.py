@@ -12,7 +12,7 @@ import sys
 import json
 import time
 
-# Ensure we can import from the same directory
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 from agent import ClosiraAgent, generate_summary
@@ -47,7 +47,7 @@ def run_scenario(name: str, filename: str, turns: list[str], *, qualify: bool = 
     ]
 
     if qualify:
-        # Start qualification flow
+        
         print("  [Starting qualification mode]")
         reply = agent.start_qualification()
         print(f"  Aria: {reply}")
@@ -59,7 +59,7 @@ def run_scenario(name: str, filename: str, turns: list[str], *, qualify: bool = 
         transcript.append(f"You: {user_msg}")
 
         if qualify and agent.qualifying_mode:
-            # In qualification, respond() handles the flow
+            
             pass
 
         reply = agent.respond(user_msg)
@@ -67,9 +67,9 @@ def run_scenario(name: str, filename: str, turns: list[str], *, qualify: bool = 
         transcript.append(f"Aria: {reply}")
         transcript.append("")
 
-        time.sleep(0.4)  # polite rate-limiting
+        time.sleep(0.4) 
 
-    # Generate summary
+    
     summary = agent.end_session()
     transcript.append("─" * 55)
     transcript.append("SESSION SUMMARY (JSON)")
@@ -79,9 +79,7 @@ def run_scenario(name: str, filename: str, turns: list[str], *, qualify: bool = 
     return transcript
 
 
-# ──────────────────────────────────────────────
-# SCENARIO DEFINITIONS
-# ──────────────────────────────────────────────
+
 
 def scenario_1_in_sop():
     """In-SOP question — Botox pricing"""
@@ -129,8 +127,7 @@ def scenario_3_escalation_trigger():
 
 def scenario_4_lead_qualification():
     """Lead qualification — 3 structured questions"""
-    # With qualify=True, agent starts qualification mode from the top
-    # then we feed answers as turns
+    
     turns = [
         "It's for personal use — I'm interested in Botox for myself.",
         "Maybe 1–2 treatments per year.",
@@ -161,9 +158,8 @@ def scenario_5_conversation_summary():
     save_transcript("05_conversation_summary.md", lines)
 
 
-# ──────────────────────────────────────────────
-# Main
-# ──────────────────────────────────────────────
+
+
 
 def main():
     print("\n" + "═" * 55)
