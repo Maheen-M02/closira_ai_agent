@@ -1,0 +1,10 @@
+{
+  "customer_intent": "No customer interaction was recorded in this session",
+  "key_details_collected": [],
+  "sop_gaps_identified": [],
+  "lead_qualification_summary": "No lead qualification data was collected during this session. The conversation appears to be empty with no customer responses or interactions recorded. Lead quality cannot be assessed and no qualifying information is available.",
+  "escalated": false,
+  "escalation_reason": null,
+  "recommended_next_action": "Review system logs to determine why the conversation is empty, check for any technical issues with the chat interface or session recording, and attempt to re-engage the customer if contact information is available from another source.",
+  "session_timestamp": "2026-05-23T16:21:12.400647"
+}

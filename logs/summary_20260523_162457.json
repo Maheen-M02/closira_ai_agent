@@ -1,0 +1,18 @@
+{
+  "customer_intent": "The customer wanted to enquire about Botox pricing and laser hair removal services for personal use",
+  "key_details_collected": [
+    "Botox pricing shared: starts from \u00a3200",
+    "Laser hair removal availability could not be confirmed by the AI",
+    "Customer type: personal",
+    "Estimated treatments/bookings per month: 3",
+    "No existing booking or CRM tools in use \u2014 first time"
+  ],
+  "sop_gaps_identified": [
+    "Laser hair removal service availability was not listed in the AI's knowledge base and could not be confirmed"
+  ],
+  "lead_qualification_summary": "The customer is a personal client looking to book approximately 3 treatments per month. They have no existing CRM or booking system, indicating they are a new client with no prior relationship with the business. While the lead volume is modest, they represent a genuine prospective personal client. Qualification was completed successfully across all three questions.",
+  "escalated": true,
+  "escalation_reason": "Customer expressed frustration and dissatisfaction, likely triggered by the AI's inability to confirm laser hair removal availability",
+  "recommended_next_action": "A human team member should contact the customer promptly to apologise for the experience, confirm whether laser hair removal is offered, provide full service and pricing information, and offer to book a free initial consultation to convert this lead",
+  "session_timestamp": "2026-05-23T16:57:56.493183"
+}
